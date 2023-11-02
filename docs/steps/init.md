@@ -30,3 +30,5 @@ git commit -m "feat: Initial commit"
 git remote add origin git@github.com:Zerkath/finance-app.git
 git push -u origin main
 ```
+
+
