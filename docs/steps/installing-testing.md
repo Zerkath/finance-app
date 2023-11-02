@@ -35,15 +35,13 @@ export default defineConfig({
 Once this is done we should append the following to our `package.json` scripts.
 ```json
 "scripts": {
-    ..,
     "test:frontend": "vitest run",
     "test:watch": "vitest",
-    ..
 }
 ```
 
 If we test our test with `npm run test:frontend` we will get a exit code of 1 because there are no tests.
-Temporarily we can create a file [main.test.ts](./src/main.test.ts)
+Temporarily we can create a file [main.test.ts](../../src/main.test.ts)
 ```ts
 import { test, expect } from 'vitest';
 
@@ -60,7 +58,7 @@ To prepare for testing the frontend components we should also install testing-li
 
 ## Installing tarpaulin
 
-We should add tarpaulin as a build dependency in the [src-tauri/cargo.toml](./src-tauri/cargo.toml)
+We should add tarpaulin as a build dependency in the [src-tauri/cargo.toml](../../src-tauri/cargo.toml)
 While we are adding it we might as well add the dependency for sqlite, 
 we are using rusqlite features bundled means the sqlite binary will be included and will not be a requirement in the application once bundled.
 
@@ -83,9 +81,7 @@ To interact with cargo more easily from project root we can create a script to `
 
 ```json
 "scripts": {
-    ..,
     "cargo": "cd src-tauri; cargo",
-    ..
 }
 ```
 This allows us to run `npm run cargo <command>`.
@@ -94,9 +90,7 @@ We can create a command to run our tests with this will generate a html report.
 
 ```json
 "scripts": {
-    ..,
     "test:backend": "cd src-tauri; cargo tarpaulin -o html --output-dir target/coverage --skip-clean",
-    ..
 }
 ```
 
@@ -110,10 +104,10 @@ npm install -D eslint
 ```
 
 The following files are included to control formatting and ignore some folders and files to save resources.
-[.prettierrc](.prettierrc)
-[.eslintrc.cjs](.eslintrc.cjs)
-[.prettierignore](.prettierignore)
-[.eslintignore](.eslintignore)
+[.prettierrc](../../.prettierrc)
+[.eslintrc.cjs](../../.eslintrc.cjs)
+[.prettierignore](../../.prettierignore)
+[.eslintignore](../../.eslintignore)
 
 We want to add a few more scripts and in the end our scripts should look this
 
