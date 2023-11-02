@@ -1,10 +1,10 @@
 # Preparing the project for testing
 
-Our frontend is written in typescript / javascript and the frontend components are created by svelte.
+Our frontend is written in TypeScript / JavaScript and the frontend components are created by svelte.
 The backend code is written in rust.
 
-Tauri-app does not ship with testing libraries, so we need to add them manually.
-The frontend is using Vite as the build and server tool and we can add Vitest to create tests for our frontend logic.
+Tauri-App does not ship with testing libraries, so we need to add them manually.
+The frontend is using Vite as the build and server tool, and we can add Vitest to create tests for our frontend logic.
 To test frontend components we will also need to add testing-library for svelte.
 
 Rust already supports testing out of the box with cargo test. 
@@ -58,7 +58,7 @@ To prepare for testing the frontend components we should also install testing-li
 
 ## Installing tarpaulin
 
-We should add tarpaulin as a build dependency in the [src-tauri/Cargo.toml](../../src-tauri/cargo.toml)
+We should add tarpaulin as a build dependency in the [src-tauri/Cargo.toml](../../src-tauri/Cargo.toml)
 While we are adding it we might as well add the dependency for sqlite, 
 we are using rusqlite features bundled means the sqlite binary will be included and will not be a requirement in the application once bundled.
 
@@ -128,3 +128,9 @@ We want to add a few more scripts and in the end our scripts should look this
     "tauri": "tauri"
   },
 ```
+
+When developing the application we can run
+`npm run tauri dev` this will start the UI application that will refresh on code changes.
+
+If we want to instead develop against tests we can use the `test:backend:watch` or `test:frontend:watch` to test each part of the application seperately, the tests are re-run on code changes.
+We can also test both at the same time with `test:watch`.
