@@ -24,9 +24,9 @@ npm run test
 exit 0
 ```
 
-This file is found in [scripts/pre-commit](../../scripts/pre-commit)
-Note the file should be converted into a executable with the command `chmod +x pre-commit`
-This file should be copied into the `.git/hooks/` folder.
-This can be done with the following command in root of project `cp scripts/pre-commit .git/hooks/`
+This file is found in [scripts/pre-commit](../../scripts/pre-commit)  
+Note the file should be converted into a executable with the command `chmod +x pre-commit`  
+This file should be copied into the `.git/hooks/` folder.  
+This can be done with the following command in root of project `cp scripts/pre-commit .git/hooks/`  
 
 
