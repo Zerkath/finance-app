@@ -58,14 +58,13 @@ To prepare for testing the frontend components we should also install testing-li
 
 ## Installing tarpaulin
 
-We should add tarpaulin as a build dependency in the [src-tauri/cargo.toml](../../src-tauri/cargo.toml)
+We should add tarpaulin as a build dependency in the [src-tauri/Cargo.toml](../../src-tauri/cargo.toml)
 While we are adding it we might as well add the dependency for sqlite, 
 we are using rusqlite features bundled means the sqlite binary will be included and will not be a requirement in the application once bundled.
 
 ```toml
 [build-dependencies]
 cargo-tarpaulin = { version = "0.27.1", features = [] }
-..
 
 [dependencies]
 rusqlite = {version = "0.29.0", features = ["bundled"] }
