@@ -7,6 +7,15 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
+    "cargo": "cd src-tauri; cargo",
+    "test:backend": "cd src-tauri; cargo tarpaulin -o html --output-dir target/coverage --skip-clean",
+    "test:frontend": "vitest run",
+    "test:frontend:watch": "vitest",
+    "test:backend:watch": "cd src-tauri; cargo watch -x test",
+    "test:watch": "concurrently --kill-others \"npm run test:frontend:watch\" \"npm run test:backend:watch\"",
+    "test": "concurrently --kill-others-on-fail \"npm run test:backend\" \"npm run test:frontend\"",
+    "lint": "prettier --check . && eslint .",
+    "format": "prettier --write .",
     "check": "svelte-check --tsconfig ./tsconfig.json",
     "tauri": "tauri"
   },
@@ -15,13 +24,20 @@
   },
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^2.4.2",
+    "@tauri-apps/cli": "^1.5.0",
     "@tsconfig/svelte": "^5.0.0",
+    "concurrently": "^8.2.2",
+    "eslint": "^8.52.0",
+    "eslint-config-prettier": "^8.5.0",
+    "jsdom": "^22.1.0",
+    "prettier": "3.0.3",
+    "prettier-plugin-svelte": "^3.0.3",
     "svelte": "^4.0.5",
     "svelte-check": "^3.4.6",
     "svelte-preprocess": "^5.0.0",
     "tslib": "^2.6.0",
     "typescript": "^5.0.2",
     "vite": "^4.4.4",
-    "@tauri-apps/cli": "^1.5.0"
+    "vitest": "^0.34.6"
   }
 }
