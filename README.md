@@ -1,7 +1,16 @@
-# Tauri + Svelte + Typescript
+# Finance App
 
-This template should help get you started developing with Tauri, Svelte and TypeScript in Vite.
+TODO adding a section on what is the mission of this application
 
-## Recommended IDE Setup
+## Setup
 
-[VS Code](https://code.visualstudio.com/) + [Svelte](https://marketplace.visualstudio.com/items?itemName=svelte.svelte-vscode) + [Tauri](https://marketplace.visualstudio.com/items?itemName=tauri-apps.tauri-vscode) + [rust-analyzer](https://marketplace.visualstudio.com/items?itemName=rust-lang.rust-analyzer).
+### Run setup script
+
+`./scripts/init`
+
+### Or alternatively run commands manually
+
+Install the pre-commit hook `cp scripts/pre-commit .git/hooks/`.
+Install the required cargo packages: `npm run cargo install cargo-tarpaulin cargo-watch`
+Initialize the project with `npm run tauri dev`
+

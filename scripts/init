@@ -1,0 +1,10 @@
+#!/bin/bash
+
+cp scripts/pre-commit .git/hooks/
+
+npm i
+
+npm run cargo install cargo-tarpaulin cargo-watch
+
+npm run tauri dev
+
