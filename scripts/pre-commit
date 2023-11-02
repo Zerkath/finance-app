@@ -1,0 +1,12 @@
+#!/bin/bash
+
+# Verify the formatting and linting are followed
+npm run lint
+
+# Make quick verification of the rust project
+npm run cargo check
+
+# Runs both test:frontend & test:backend
+npm run test
+
+exit 0
