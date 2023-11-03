@@ -13,7 +13,7 @@ pub fn init_tables(db: &Connection) -> Result<(), rusqlite::Error> {
           value REAL NOT NULL, -- monetary value, no currency based on users locale
           name TEXT NOT NULL, -- mandatory name of transactions
           description TEXT, -- optional text
-          date_created TEXT -- start of recur if type is non null
+          date_created TEXT NOT NULL
         );
 
         CREATE TABLE IF NOT EXISTS transaction_categories(
