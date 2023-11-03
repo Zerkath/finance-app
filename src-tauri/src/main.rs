@@ -6,6 +6,7 @@ mod category_service;
 mod migration_service;
 mod transaction_service;
 mod shared_service;
+mod report_service;
 
 fn main() {
     tauri::Builder::default()
