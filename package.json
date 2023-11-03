@@ -8,7 +8,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "cargo": "cd src-tauri; cargo",
-    "test:backend": "cd src-tauri; cargo tarpaulin -o html --output-dir target/coverage --skip-clean",
+    "test:backend": "cd src-tauri; cargo tarpaulin --skip-clean -o html --output-dir target/coverage",
     "test:frontend": "vitest run",
     "test:frontend:watch": "vitest",
     "test:backend:watch": "cd src-tauri; cargo watch -x test",
