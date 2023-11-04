@@ -105,6 +105,9 @@ fn get_basic_report(handle: AppHandle, report_type: models::ReportType, selected
 #[cfg(not(tarpaulin_include))]
 fn main() {
     tauri::Builder::default()
+        .manage(AppState {
+            db: Default::default(),
+        })
         .setup(|app| {
             let handle = app.handle();
 
