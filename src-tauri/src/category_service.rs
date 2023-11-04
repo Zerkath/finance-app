@@ -100,12 +100,16 @@ fn insert_should_ignore_casing() -> Result<(), rusqlite::Error> {
 #[test]
 fn insert_should_ignore_surrounding_whitespace() -> Result<(), rusqlite::Error> {
     let conn = init_db_in_memory()?;
+
+    // these should be present
     insert_category(&conn, "foobar")?;
+    insert_category(&conn, "foo bar")?;
+
+    // these should not occur because they are duplicates
     insert_category(&conn, " foobar")?;
     insert_category(&conn, "foobar")?;
     insert_category(&conn, " foobar")?;
     insert_category(&conn, "    foobar  ")?;
-    insert_category(&conn, "foo bar")?;
     let list = get_categories(&conn)?;
 
     assert!(
