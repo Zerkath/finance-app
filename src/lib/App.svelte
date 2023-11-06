@@ -1,11 +1,11 @@
 <script lang="ts">
 
-  import Navbar from './lib/Navbar.svelte';
-  import Listing from './lib/Listing.svelte';
-  import Categories from './lib/Categories.svelte';
-  import Reports from './lib/Reports.svelte';
-  import Options from './lib/Options.svelte';
-  import type { Option } from './lib/types';
+  import Navbar from './Navbar.svelte';
+  import Listing from './Listing.svelte';
+  import Categories from './Categories.svelte';
+  import Reports from './Reports.svelte';
+  import Options from './Options.svelte';
+  import type { Option } from './types';
 
   let activeOption: Option = localStorage.getItem('option')
     ? (localStorage.getItem('option') as Option)
