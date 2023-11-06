@@ -18,11 +18,21 @@
 
   let name: string = '';
   let value = 0;
+  let isExpense = true;
   let description: string | undefined = undefined;
   let dateCreated: string = new Date().toISOString().split('T')[0];
   let categoryIds: number[] = [];
 
-  const insertExpense = () => {
+  const insertTransaction = () => {
+
+    if (name == '' || value == 0 || dateCreated == '') {
+      return; // alert that the name and value are required
+    }
+
+    // also absolute
+    value = Math.abs(value);
+    value = isExpense ? -value : value;
+
     invoke('insert_transaction', {
       value,
       name,
@@ -33,6 +43,7 @@
       value = 0;
       name = '';
       description = undefined;
+      isExpense = true;
       dateCreated = new Date().toISOString().split('T')[0];
       categoryIds = [];
     });
@@ -47,28 +58,30 @@
       updateCategoriesList();
     });
   };
-
-  $: categories, console.log(categories);
 </script>
 
 <div class="creation-forms">
-  <div class="expense-form">
-    <h3>Expense Creation Form</h3>
+  <div class="transaction-form">
+    <h3>Transaction Creation Form</h3>
     <input type="text" placeholder="Name" bind:value={name} />
     <input type="text" placeholder="Description" bind:value={description} />
     <input type="number" placeholder="Amount" bind:value />
     <input type="date" placeholder="Date" bind:value={dateCreated} />
+    <div style="display: flex; align-items: center;">
+      <span style="font-size: 12px; margin-right: 5px;">Is Expense?</span>
+      <input type="checkbox" bind:checked={isExpense}/>
+    </div>
     <select multiple bind:value={categoryIds}>
       {#each categories as category}
         <option value={category.id}>{category.label}</option>
       {/each}
     </select>
 
-    <input type="submit" on:click={insertExpense} value="Add Expense" />
+    <input type="submit" on:click={insertTransaction} value="Add Transaction" />
   </div>
 
   <div class="category-form">
-    <h3>Categories</h3>
+    <h3>Modify Categories</h3>
     <input bind:value={categoryLabel} />
     <button style="margin-bottom: 1rem;" on:click={upsertCategory}>Add</button>
     {#each categories as category}
@@ -105,7 +118,7 @@
     flex-direction: column;
   }
 
-  .expense-form {
+  .transaction-form {
     display: flex;
     flex-direction: column;
   }

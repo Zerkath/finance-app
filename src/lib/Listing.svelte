@@ -1,6 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { invoke } from '@tauri-apps/api/tauri';
+  import type { Category } from './types';
 
   const columns = [
     'Name',
@@ -13,29 +14,38 @@
 
   onMount(() => {
     updateCategoriesList();
-    getTransactions();
+    updatePage();
   });
 
   let currentPage = 1;
+  let totalPages = 1;
   let pageSize = 25;
 
-  let categories: string[] = [];
+  let categories: Category[] = [];
+
   const updateCategoriesList = () => {
-    invoke('get_categories', {
-      pageSize: pageSize,
-      currentPage: currentPage
-    }).then((res) => {
+    invoke('get_categories').then((res) => {
       if (Array.isArray(res)) {
         categories = res;
       }
     });
   };
 
-  const getTransactions = () => {
-    invoke('get_transactions').then((res) => {
-      if (Array.isArray(res)) {
-        data = res;
-      }
+  const updatePage = () => {
+    invoke('get_transactions', {
+      pageSize: pageSize,
+      currentPage: currentPage
+    }).then((res) => {
+      if (res == null) return;
+      const {total_pages, transactions} = res;
+      totalPages = total_pages;
+      data = transactions;
+    });
+  };
+
+  const remove = (id: number) => {
+    invoke('delete_transaction', { id: id }).then(() => {
+      updatePage();
     });
   };
 
@@ -43,7 +53,7 @@
 
   let startDate: string;
   let endDate: string | undefined;
-  let selectedCategories: string[] = [];
+  let selectedCategories: number[] = [];
 
   const search = () => {
     updateCategoriesList();
@@ -54,8 +64,8 @@
     name: string;
     description: string;
     value: number;
-    date: Date;
-    categories: string[];
+    date_created: string;
+    categories: Category[];
   };
 </script>
 
@@ -63,7 +73,6 @@
   <div class="list__bar">
     <div class="list__form">
       <input type="text" placeholder="Search" />
-      <label for="list_category_select">Category</label>
       <!-- TODO should be a multi-select dropdown -->
       <select
         multiple
@@ -73,18 +82,16 @@
         id="list_category_select"
       >
         {#each categories as category}
-          <option>{category}</option>
+          <option value={category.id}>{category.label}</option>
         {/each}
       </select>
-      <label for="list_start_date">Start Date</label>
       <input bind:value={startDate} type="date" id="list_start_date" />
-      <label for="list_end_date">End Date</label>
       <input bind:value={endDate} type="date" id="list_end_date" />
       <button on:click={search}>Search</button>
     </div>
     <div>
       <span>(Previous Page)</span>
-      <span>[1 of 10]</span>
+      <span>{`[${currentPage} of ${totalPages}]`}</span>
       <span>(Next Page)</span>
     </div>
   </div>
@@ -99,20 +106,27 @@
     {#each data as row}
       <tr>
         <td>{row.name}</td>
-        <td>{row.description}</td>
+        <td>{row.description ? row.description : ""}</td>
         <td>{row.value}</td>
-        <td>{row.date}</td>
-        <td>{row.categories}</td>
-        <td style="max-width: fit-content">
-          <button>Edit</button>
-          <button>Delete</button>
+        <td>{row.date_created}</td>
+        <td>
+          {#each row.categories as category}
+            <span
+              style="padding: 4px; margin: 5px; background: lightgrey; border-radius: 5px;"
+              id={category.id.toString()}>{category.label}</span
+            >
+          {/each}
+        </td>
+        <td>
+          <button on:click={() => remove(row.id)}>Remove</button>
+          <button disabled>Modify</button>
         </td>
       </tr>
     {/each}
   </table>
   <div>
     <span>(Previous Page)</span>
-    <span>[1 of 10]</span>
+    <span>{`[${currentPage} of ${totalPages}]`}</span>
     <span>(Next Page)</span>
   </div>
 </div>

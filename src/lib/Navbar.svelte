@@ -66,8 +66,14 @@
     {#if index === 3}
       <div class="navbar__spacer" />
     {/if}
-    <div class={`navbar__option ${option.className ? option.className : ""}`} on:click={option.action}>
-      <PlaceholderIcon content={index} />
+    <div
+      class={`navbar__option ${option.className ? option.className : ''}`}
+      role="button"
+      tabindex={index}
+      on:click={option.action}
+      on:keypress={option.action}
+    >
+      <PlaceholderIcon content={index.toString()} />
       <NavbarOptionText
         header={option.header}
         desc={option.desc}
