@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script lang="ts">
   import PlaceholderIcon from './PlaceholderIcon.svelte';
   import NavbarOptionText from './NavbarOptionText.svelte';
 
@@ -6,7 +6,6 @@
 
   const collapse = () => {
     isCollapsed = !isCollapsed;
-    console.log(isCollapsed);
   };
 </script>
 
@@ -16,7 +15,7 @@
     <NavbarOptionText
       header="Listing"
       desc="List expenses, do modifications and removals"
-      isCollapsed={isCollapsed}
+      {isCollapsed}
     />
   </div>
   <div class="navbar__option">
@@ -24,7 +23,7 @@
     <NavbarOptionText
       header="Reports"
       desc="View visualized aggregate information about transactions"
-      isCollapsed={isCollapsed}
+      {isCollapsed}
     />
   </div>
   <div class="navbar__option">
@@ -32,16 +31,16 @@
     <NavbarOptionText
       header="Categories & Transactions"
       desc="Add new transactions, modify, add or remove categories"
-      isCollapsed={isCollapsed}
+      {isCollapsed}
     />
   </div>
   <div class="navbar__spacer navbar__landscape" />
   <div class="navbar__option navbar__landscape" on:click={collapse}>
-    <PlaceholderIcon content="4"/>
+    <PlaceholderIcon content="4" />
     <NavbarOptionText
       header="Collapse"
       desc="Collapse the sidebar"
-      isCollapsed={isCollapsed}
+      {isCollapsed}
     />
   </div>
   <div class="navbar__option">
@@ -49,7 +48,7 @@
     <NavbarOptionText
       header="Options"
       desc="Application options"
-      isCollapsed={isCollapsed}
+      {isCollapsed}
     />
   </div>
 </div>
@@ -60,10 +59,11 @@
   }
 
   .navbar__option {
-    margin: 10px;
+    margin: 15px 20px;
     display: flex;
     align-items: center;
     width: fit-content;
     flex-direction: row;
+    cursor: pointer;
   }
 </style>
