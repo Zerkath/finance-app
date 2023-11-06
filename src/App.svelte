@@ -1,4 +1,5 @@
 <script lang="ts">
+
   import Navbar from './lib/Navbar.svelte';
   import Listing from './lib/Listing.svelte';
   import Categories from './lib/Categories.svelte';
@@ -6,12 +7,17 @@
   import Options from './lib/Options.svelte';
   import type { Option } from './lib/types';
 
-  // TODO could be stored in browser storage
-  let activeOption: Option = 'listing';
+  let activeOption: Option = localStorage.getItem('option')
+    ? (localStorage.getItem('option') as Option)
+    : 'listing';
 
-  function handleChange(e) {
-    activeOption = e.detail;
-  }
+  const handleChange = (e) => {
+    const option = <Option> e.detail;
+    console.log(option);
+    localStorage.setItem('option', option);
+    activeOption = option;
+  };
+
 </script>
 
 <main class="container">
@@ -31,6 +37,7 @@
 
 <style>
   .content__container {
+    margin: 1rem;
     width: 100%;
     height: 100%;
   }
