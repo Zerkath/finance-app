@@ -38,6 +38,8 @@ fn insert_category(handle: AppHandle, label: &str) -> Result<(), String> {
         .map_err(|e| e.to_string())
 }
 
+
+// TODO should add extra query params like search, sort, date selectors
 #[tauri::command]
 #[cfg(not(tarpaulin_include))]
 fn get_transactions(

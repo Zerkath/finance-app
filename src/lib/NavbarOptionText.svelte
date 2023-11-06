@@ -20,6 +20,7 @@
     margin: 0 12px;
     display: flex;
     flex-direction: column;
+    min-width: 150px;
   }
 
   .navbar__text__header {
