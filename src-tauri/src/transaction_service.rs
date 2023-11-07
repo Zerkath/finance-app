@@ -11,26 +11,32 @@ pub fn query_page(
 ) -> Result<Page, rusqlite::Error> {
     let sanitized_search = format!("%{}%", search.trim().replace("%", ""));
 
-    let ids: &str = &selected_categories
-        .iter()
-        .map(|i| i.to_string())
-        .collect::<Vec<String>>()
-        .join(", ");
+    let ids = &std::rc::Rc::new(
+        selected_categories
+            .clone()
+            .into_iter()
+            .map(rusqlite::types::Value::from)
+            .collect::<Vec<rusqlite::types::Value>>(),
+    );
 
     let count: i32 = db.query_row(
         "
         SELECT COUNT(*) 
         FROM transactions as t
-        WHERE (LENGTH(:ids) = 0 OR t.id IN (
+        WHERE ((:len) = 0 OR t.id IN (
             SELECT transaction_id 
             FROM transaction_categories 
-            WHERE category_id IN (:ids)
+            WHERE category_id IN rarray(:ids)
         ))
         AND (name LIKE (:x) OR description LIKE (:x))
-        ", named_params!{
+        ",
+        named_params! {
             ":x": sanitized_search,
             ":ids": ids,
-        }, |row| row.get(0))?;
+            ":len": ids.len(),
+        },
+        |row| row.get(0),
+    )?;
 
     let total_pages = if count == 0 {
         1
@@ -49,10 +55,10 @@ pub fn query_page(
         description,
         date_created
         FROM transactions as t
-        WHERE (LENGTH(:ids) = 0 OR t.id IN (
+        WHERE ((:len) = 0 OR t.id IN (
             SELECT transaction_id 
             FROM transaction_categories 
-            WHERE category_id IN (:ids)
+            WHERE category_id IN rarray(:ids)
         ))
         AND (name LIKE (:x) OR description LIKE (:x))
         ORDER BY date_created, id ASC 
@@ -61,12 +67,12 @@ pub fn query_page(
         ",
     )?;
 
-
     let mut transaction_rows = transaction_rows_statement.query(named_params! {
         ":page_size": page_size,
         ":offset": (current_page - 1) * page_size,
         ":x": sanitized_search,
         ":ids": ids,
+        ":len": ids.len(),
     })?;
 
     let mut transaction_category_labels =
@@ -426,6 +432,64 @@ fn should_be_able_to_query_by_category() -> Result<(), rusqlite::Error> {
         "Expected 0 entries, got {:?} by category id {:?}",
         filter_page.transactions,
         category_2.id
+    );
+
+    Ok(())
+}
+
+#[test]
+fn should_be_able_to_query_by_multiple_categories() -> Result<(), rusqlite::Error> {
+    let conn = init_db_in_memory()?;
+
+    crate::category_service::insert_category(&conn, "foo")?;
+    crate::category_service::insert_category(&conn, "bar")?;
+    let category_1 = &crate::category_service::get_categories(&conn)?[0];
+    let category_2 = &crate::category_service::get_categories(&conn)?[1];
+
+    insert_transaction(&conn, 1.0, "test1", None, "2023-11-01", vec![category_1.id])?;
+
+    insert_transaction(
+        &conn,
+        1.0,
+        "test2",
+        None,
+        "2023-11-01",
+        vec![category_1.id, category_2.id],
+    )?;
+
+    insert_transaction(&conn, 1.0, "test3", None, "2023-11-01", vec![category_2.id])?;
+
+    insert_transaction(&conn, 1.0, "test4", None, "2023-11-01", vec![])?;
+
+    let filter_page = query_page(&conn, 10, 1, "", vec![])?;
+    assert!(
+        filter_page.transactions.len() == 4,
+        "Expected 4 entry, got {:?}",
+        filter_page.transactions
+    );
+
+    let filter_page = query_page(&conn, 10, 1, "", vec![category_1.id, category_2.id])?;
+    assert!(
+        filter_page.transactions.len() == 3,
+        "Expected 3 entry, got {:?} {:?}",
+        filter_page.transactions.len(),
+        filter_page.transactions
+    );
+
+    let filter_page = query_page(&conn, 10, 1, "", vec![category_1.id])?;
+    assert!(
+        filter_page.transactions.len() == 2,
+        "Expected 2 entry, got {:?} {:?}",
+        filter_page.transactions.len(),
+        filter_page.transactions
+    );
+
+    let filter_page = query_page(&conn, 10, 1, "", vec![category_2.id])?;
+    assert!(
+        filter_page.transactions.len() == 2,
+        "Expected 2 entry, got {:?} {:?}",
+        filter_page.transactions.len(),
+        filter_page.transactions
     );
 
     Ok(())
