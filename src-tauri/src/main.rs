@@ -46,9 +46,11 @@ fn get_transactions(
     handle: AppHandle,
     page_size: i32,
     current_page: i32,
+    search: &str,
+    selected_categories: Vec<i32>,
 ) -> Result<models::Page, String> {
     handle
-        .db(|db| transaction_service::query_page(db, page_size, current_page))
+        .db(|db| transaction_service::query_page(db, page_size, current_page, search, selected_categories))
         .map_err(|e| e.to_string())
 }
 
@@ -104,6 +106,21 @@ fn get_basic_report(handle: AppHandle, report_type: models::ReportType, selected
         .map_err(|e| e.to_string())
 }
 
+#[tauri::command]
+#[cfg(not(tarpaulin_include))]
+fn reset_database(handle: AppHandle) -> Result<(), String> {
+    handle
+        .db(|db| migration_service::reset_tables(db))
+        .map_err(|e| e.to_string())
+}
+
+#[tauri::command]
+fn init_with_data(handle: AppHandle) -> Result<(), String> {
+    handle
+        .db(|db| migration_service::init_db_with_data(db))
+        .map_err(|e| e.to_string())
+}
+
 #[cfg(not(tarpaulin_include))]
 fn main() {
     tauri::Builder::default()
@@ -139,7 +156,9 @@ fn main() {
             delete_transaction,
             insert_transaction,
             get_report_types,
-            get_basic_report
+            get_basic_report,
+            reset_database,
+            init_with_data
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

@@ -6,8 +6,31 @@ pub fn query_page(
     db: &Connection,
     page_size: i32,
     current_page: i32,
+    search: &str,
+    selected_categories: Vec<i32>,
 ) -> Result<Page, rusqlite::Error> {
-    let count: i32 = db.query_row("SELECT COUNT(*) FROM transactions", [], |row| row.get(0))?;
+    let sanitized_search = format!("%{}%", search.trim().replace("%", ""));
+
+    let ids: &str = &selected_categories
+        .iter()
+        .map(|i| i.to_string())
+        .collect::<Vec<String>>()
+        .join(", ");
+
+    let count: i32 = db.query_row(
+        "
+        SELECT COUNT(*) 
+        FROM transactions as t
+        WHERE (LENGTH(:ids) = 0 OR t.id IN (
+            SELECT transaction_id 
+            FROM transaction_categories 
+            WHERE category_id IN (:ids)
+        ))
+        AND (name LIKE (:x) OR description LIKE (:x))
+        ", named_params!{
+            ":x": sanitized_search,
+            ":ids": ids,
+        }, |row| row.get(0))?;
 
     let total_pages = if count == 0 {
         1
@@ -19,22 +42,31 @@ pub fn query_page(
 
     let mut transaction_rows_statement = db.prepare(
         "
-           SELECT
-           id,
-           value,
-           name,
-           description,
-           date_created
-           FROM transactions 
-           ORDER BY date_created ASC 
-           LIMIT :page_size 
-           OFFSET :offset
-           ",
+        SELECT
+        id,
+        value,
+        name,
+        description,
+        date_created
+        FROM transactions as t
+        WHERE (LENGTH(:ids) = 0 OR t.id IN (
+            SELECT transaction_id 
+            FROM transaction_categories 
+            WHERE category_id IN (:ids)
+        ))
+        AND (name LIKE (:x) OR description LIKE (:x))
+        ORDER BY date_created, id ASC 
+        LIMIT :page_size 
+        OFFSET :offset
+        ",
     )?;
+
 
     let mut transaction_rows = transaction_rows_statement.query(named_params! {
         ":page_size": page_size,
         ":offset": (current_page - 1) * page_size,
+        ":x": sanitized_search,
+        ":ids": ids,
     })?;
 
     let mut transaction_category_labels =
@@ -157,7 +189,7 @@ fn insert_should_succeed() -> Result<(), rusqlite::Error> {
 #[test]
 fn query_should_return_nil_when_new() -> Result<(), rusqlite::Error> {
     let conn = init_db_in_memory()?;
-    let page = query_page(&conn, 10, 1)?;
+    let page = query_page(&conn, 10, 1, "", vec![])?;
 
     assert!(
         page.transactions.len() == 0,
@@ -176,7 +208,7 @@ fn query_should_return_nil_when_new() -> Result<(), rusqlite::Error> {
 fn query_should_return_entry_after_insert() -> Result<(), rusqlite::Error> {
     let conn = init_db_in_memory()?;
     insert_transaction(&conn, 1.0, "test", None, "2023-11-01", vec![])?;
-    let page = query_page(&conn, 10, 1)?;
+    let page = query_page(&conn, 10, 1, "", vec![])?;
 
     assert!(
         page.transactions.len() == 1,
@@ -196,7 +228,7 @@ fn query_should_return_empty_page_if_added_entry_is_removed() -> Result<(), rusq
     let conn = init_db_in_memory()?;
     insert_transaction(&conn, 1.0, "test", None, "2023-11-01", vec![])?;
     delete_transaction(&conn, 1)?;
-    let page = query_page(&conn, 10, 1)?;
+    let page = query_page(&conn, 10, 1, "", vec![])?;
 
     assert!(
         page.transactions.len() == 0,
@@ -215,7 +247,7 @@ fn query_should_return_empty_page_if_added_entry_is_removed() -> Result<(), rusq
 fn inserting_missing_categories_should_not_result_in_failure() -> Result<(), rusqlite::Error> {
     let conn = init_db_in_memory()?;
     insert_transaction(&conn, 1.0, "test", None, "2023-11-01", vec![1, 2])?;
-    let page = query_page(&conn, 10, 1)?;
+    let page = query_page(&conn, 10, 1, "", vec![])?;
 
     assert!(
         page.transactions.len() == 1,
@@ -235,7 +267,7 @@ fn querying_inserted_entry_with_non_existing_categories_should_return_empty_cate
 ) -> Result<(), rusqlite::Error> {
     let conn = init_db_in_memory()?;
     insert_transaction(&conn, 1.0, "test", None, "2023-11-01", vec![1, 2])?;
-    let page = query_page(&conn, 10, 1)?;
+    let page = query_page(&conn, 10, 1, "", vec![])?;
 
     assert!(
         page.transactions.len() == 1,
@@ -265,7 +297,7 @@ fn querying_transaction_when_category_exists_should_return_correct_list(
 
     insert_transaction(&conn, 1.0, "test", None, "2023-11-01", vec![category.id])?;
 
-    let page = query_page(&conn, 10, 1)?;
+    let page = query_page(&conn, 10, 1, "", vec![])?;
     assert!(
         page.transactions.len() == 1,
         "Expected 1 entry, got {:?}",
@@ -317,7 +349,7 @@ fn querying_transaction_after_category_removal_should_reflect_the_change(
         "2023-11-01",
         vec![category_1.id, category_2.id],
     )?;
-    let page = query_page(&conn, 10, 1)?;
+    let page = query_page(&conn, 10, 1, "", vec![])?;
     assert!(
         page.transactions.len() == 1,
         "Expected 1 entry, got {:?}",
@@ -331,7 +363,7 @@ fn querying_transaction_after_category_removal_should_reflect_the_change(
 
     crate::category_service::delete_category(&conn, category_1.id)?;
 
-    let page = query_page(&conn, 10, 1)?;
+    let page = query_page(&conn, 10, 1, "", vec![])?;
     assert!(
         page.transactions.len() == 1,
         "Expected 1 entry, got {:?}",
@@ -360,5 +392,41 @@ fn querying_transaction_after_category_removal_should_reflect_the_change(
         category_2.label,
         transaction.categories[0].label
     );
+    Ok(())
+}
+
+#[test]
+fn should_be_able_to_query_by_category() -> Result<(), rusqlite::Error> {
+    let conn = init_db_in_memory()?;
+
+    crate::category_service::insert_category(&conn, "foo")?;
+    crate::category_service::insert_category(&conn, "bar")?;
+    let category_1 = &crate::category_service::get_categories(&conn)?[0];
+    let category_2 = &crate::category_service::get_categories(&conn)?[1];
+
+    insert_transaction(&conn, 1.0, "test", None, "2023-11-01", vec![category_1.id])?;
+
+    let page = query_page(&conn, 10, 1, "", vec![])?;
+    assert!(
+        page.transactions.len() == 1,
+        "Expected 1 entry, got {:?}",
+        page.transactions
+    );
+
+    let filter_page = query_page(&conn, 10, 1, "", vec![category_1.id])?;
+    assert!(
+        filter_page.transactions.len() == 1,
+        "Expected 1 entry, got {:?}",
+        filter_page.transactions
+    );
+
+    let filter_page = query_page(&conn, 10, 1, "", vec![category_2.id])?;
+    assert!(
+        filter_page.transactions.len() == 0,
+        "Expected 0 entries, got {:?} by category id {:?}",
+        filter_page.transactions,
+        category_2.id
+    );
+
     Ok(())
 }
