@@ -10,7 +10,6 @@ import CategoryComponent from './CategoryComponent.svelte';
 beforeAll(() => {
   Object.defineProperty(window, 'crypto', {
     value: {
-      // @ts-ignore
       getRandomValues: (buffer) => {
         return randomFillSync(buffer);
       }

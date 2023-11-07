@@ -24,7 +24,6 @@
   let categoryIds: number[] = [];
 
   const insertTransaction = () => {
-
     if (name == '' || value == 0 || dateCreated == '') {
       return; // alert that the name and value are required
     }
@@ -69,7 +68,7 @@
     <input type="date" placeholder="Date" bind:value={dateCreated} />
     <div style="display: flex; align-items: center;">
       <span style="font-size: 12px; margin-right: 5px;">Is Expense?</span>
-      <input type="checkbox" bind:checked={isExpense}/>
+      <input type="checkbox" bind:checked={isExpense} />
     </div>
     <select multiple bind:value={categoryIds}>
       {#each categories as category}
@@ -77,13 +76,15 @@
       {/each}
     </select>
 
-    <input type="submit" on:click={insertTransaction} value="Add Transaction" />
+    <button on:click={insertTransaction}> Add Transaction </button>
   </div>
 
   <div class="category-form">
     <h3>Modify Categories</h3>
-    <input bind:value={categoryLabel} />
-    <button style="margin-bottom: 1rem;" on:click={upsertCategory}>Add</button>
+    <div>
+      <input bind:value={categoryLabel} />
+      <button style="margin-bottom: 1rem;" on:click={upsertCategory}>Add</button>
+    </div>
     {#each categories as category}
       <CategoryComponent
         on:deleteHook={updateCategoriesList}
