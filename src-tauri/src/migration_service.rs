@@ -1,6 +1,10 @@
 use rusqlite::Connection;
 
 pub fn init_tables(db: &Connection) -> Result<(), rusqlite::Error> {
+
+    // load optional modules
+    rusqlite::vtab::array::load_module(db)?;
+    
     db.execute_batch(
         "
         CREATE TABLE IF NOT EXISTS categories (
@@ -45,6 +49,8 @@ pub fn reset_tables(db: &Connection) -> Result<(), rusqlite::Error> {
     Ok(())
 }
 
+// TODO this can be removed once testing is over
+#[cfg(not(tarpaulin_include))]
 pub fn init_db_with_data(db: &Connection) -> Result<(), rusqlite::Error> {
     let data = vec![
         (-10.0, "test1", Some("test1"), "2023-11-01", vec![1, 2, 3]),
