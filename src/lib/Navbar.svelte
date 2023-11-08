@@ -2,9 +2,14 @@
   import { createEventDispatcher } from 'svelte';
   const dispatch = createEventDispatcher();
 
-  import PlaceholderIcon from './PlaceholderIcon.svelte';
   import NavbarOptionText from './NavbarOptionText.svelte';
-  import type { Option } from './types';
+
+  import IconGear from './IconGear.svelte';
+  import IconList from './IconList.svelte';
+  import IconPencil from './IconPencil.svelte';
+  import IconGraph from './IconGraph.svelte';
+  import IconCollapse from './IconCollapse.svelte';
+  import IconExpand from './IconExpand.svelte';
 
   let isCollapsed = false;
 
@@ -15,72 +20,89 @@
   const changeOption = (option: Option) => {
     dispatch('optionChange', option);
   };
-
-  type NavbarOption = {
-    header: string;
-    desc: string;
-    className?: string;
-    action: () => void;
-  };
-
-  const options: NavbarOption[] = [
-    {
-      header: 'Listing',
-      desc: 'List expenses, do modifications and removals',
-      action: () => {
-        changeOption('listing');
-      }
-    },
-    {
-      header: 'Reports',
-      desc: 'View visualized aggregate information about transactions',
-      action: () => {
-        changeOption('reports');
-      }
-    },
-    {
-      header: 'Categories & Transactions',
-      desc: 'Add new transactions, modify, add or remove categories',
-      action: () => {
-        changeOption('categories');
-      }
-    },
-    {
-      header: 'Collapse',
-      desc: 'Collapse the sidebar',
-      className: 'navbar__landscape',
-      action: collapse
-    },
-    {
-      header: 'Options',
-      desc: 'Application options',
-      action: () => {
-        changeOption('options');
-      }
-    }
-  ];
 </script>
 
 <div class="navbar">
-  {#each options as option, index}
-    {#if index === 3}
-      <div class="navbar__spacer" />
+  <div
+    class="navbar__option"
+    role="button"
+    tabindex={1}
+    on:click={() => changeOption('listing')}
+    on:keypress={() => changeOption('listing')}
+  >
+    <IconList />
+    <NavbarOptionText
+      header={'Listing'}
+      desc={'List expenses, do modifications and removals'}
+      {isCollapsed}
+    />
+  </div>
+
+  <div
+    class="navbar__option"
+    role="button"
+    tabindex={2}
+    on:click={() => changeOption('reports')}
+    on:keypress={() => changeOption('reports')}
+  >
+    <IconGraph />
+    <NavbarOptionText
+      header={'Reports'}
+      desc={'View visualized aggregate information about transactions'}
+      {isCollapsed}
+    />
+  </div>
+
+  <div
+    class="navbar__option"
+    role="button"
+    tabindex={3}
+    on:click={() => changeOption('categories')}
+    on:keypress={() => changeOption('categories')}
+  >
+    <IconPencil />
+    <NavbarOptionText
+      header={'Categories & Transactions'}
+      desc={'Add new transactions, modify, add or remove categories'}
+      {isCollapsed}
+    />
+  </div>
+
+  <div class="navbar__spacer" />
+
+  <div
+    class="navbar__option navbar__landscape"
+    role="button"
+    tabindex={4}
+    on:click={collapse}
+    on:keypress={collapse}
+  >
+    {#if isCollapsed}
+      <IconExpand />
+    {:else}
+      <IconCollapse />
     {/if}
-    <div
-      class={`navbar__option ${option.className ? option.className : ''}`}
-      role="button"
-      tabindex={index}
-      on:click={option.action}
-      on:keypress={option.action}
-    >
-      <PlaceholderIcon content={index.toString()} />
-      <NavbarOptionText
-        header={option.header}
-        desc={option.desc}
-        {isCollapsed}
-      />
-    </div>
-  {/each}
+    <NavbarOptionText
+      header={'Collapse'}
+      desc={'Collapse the sidebar'}
+      {isCollapsed}
+    />
+  </div>
+
+  <div
+    class="navbar__option"
+    role="button"
+    tabindex={5}
+    on:click={() => changeOption('options')}
+    on:keypress={() => changeOption('options')}
+  >
+    <IconGear />
+    <NavbarOptionText
+      header={'Options'}
+      desc={'Application options'}
+      {isCollapsed}
+    />
+  </div>
 </div>
 
 <style lang="scss">
