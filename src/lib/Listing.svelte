@@ -63,7 +63,7 @@
 
   let data: Row[] = [];
 
-  let search: string = "";
+  let search: string = '';
   let startDate: string;
   let endDate: string | undefined;
   let selectedCategories: number[] = [];
@@ -103,43 +103,89 @@
     <ListNavigation {currentPage} {totalPages} on:changePage={changePage} />
   </div>
 
-  <div class="list__and__nav">
-    <table>
-      <tr>
+  <div class="list__content">
+    <div class="list__table">
+      <div class="row">
         {#each columns as column}
-          <th>{column}</th>
+          <div class="cell">{column}</div>
         {/each}
-      </tr>
+      </div>
 
       {#each data as row}
-        <tr>
-          <td>{row.name}</td>
-          <td>{row.description ? row.description : ''}</td>
-          <td>{row.value}</td>
-          <td style="overflow: hidden">{row.date_created}</td>
-          <td>
-            {#each row.categories as category}
-              <span
-                style="padding: 4px; margin: 5px; background: lightgrey; border-radius: 5px;"
-                id={category.id.toString()}>{category.label}</span
-              >
-            {/each}
-          </td>
-          <td>
+        <div class="row">
+          <div class="cell">{row.name}</div>
+          <div class="cell">{row.description ? row.description : ''}</div>
+          <div class="cell">{row.value}</div>
+          <div class="cell">{row.date_created}</div>
+          <div class="cell">
+            <div class="category">
+              {#each row.categories as category}
+                <span class="category__label" id={category.id.toString()}
+                  >{category.label}</span
+                >
+              {/each}
+            </div>
+          </div>
+          <div class="cell">
             <button on:click={() => remove(row.id)}>Remove</button>
             <button disabled>Modify</button>
-          </td>
-        </tr>
+          </div>
+        </div>
       {/each}
-    </table>
+    </div>
     <ListNavigation {currentPage} {totalPages} on:changePage={changePage} />
   </div>
 </div>
 
 <style lang="scss">
-  table {
-    border-collapse: collapse;
+  $colors: lightblue, lightcoral, lightgreen, lightgoldenrodyellow, lightskyblue,
+    lightpink, lightseagreen, lightsalmon, lightsteelblue, lightslategray;
+
+  .list__table {
+    display: table;
+    flex-direction: column;
     width: 100%;
+    margin-bottom: 20px;
+  }
+
+  .row {
+    display: table-row;
+  }
+
+  .cell {
+    display: table-cell;
+    padding: 5px;
+    border: 1px solid #ccc;
+  }
+
+  .category {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    font-size: 0.9rem;
+    text-transform: capitalize;
+  }
+
+  @for $i from 1 through length($colors) {
+    .category > span:nth-child(#{$i}) {
+      background-color: nth($colors, $i);
+    }
+  }
+
+  .category__label {
+    margin: 0 2px;
+    padding: 6px 6px;
+    border-radius: 4px;
+  }
+
+  .list__content {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    align-items: center;
+    justify-content: space-between;
   }
 
   .list__container {
@@ -148,15 +194,6 @@
     width: 100%;
     height: 100%;
     align-items: center;
-  }
-
-  .list__and__nav {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    height: 100%;
-    align-items: center;
-    justify-content: space-between;
   }
 
   .list__container > * {
@@ -181,12 +218,5 @@
 
   .list__form > * {
     margin: 5px 10px 0 0;
-  }
-
-  th,
-  td {
-    text-align: left;
-    padding: 8px;
-    border: 1px solid #000;
   }
 </style>

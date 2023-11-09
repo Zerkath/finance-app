@@ -20,15 +20,14 @@
     margin: 0 12px;
     display: flex;
     flex-direction: column;
-    min-width: 150px;
   }
 
   .navbar__text__header {
-    font-size: 1.1rem;
+    font-size: 1.0rem;
   }
 
   .navbar__text__desc {
-    font-size: 0.7rem;
+    font-size: 0.6rem;
     font-style: italic;
   }
 </style>

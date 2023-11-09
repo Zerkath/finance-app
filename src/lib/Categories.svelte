@@ -59,15 +59,14 @@
   };
 </script>
 
-<div class="creation-forms">
-  <div class="transaction-form">
-    <h3>Transaction Creation Form</h3>
+<section class="creation__forms">
+  <section class="transaction__form">
     <input type="text" placeholder="Name" bind:value={name} />
     <input type="text" placeholder="Description" bind:value={description} />
     <input type="number" placeholder="Amount" bind:value />
     <input type="date" placeholder="Date" bind:value={dateCreated} />
     <div style="display: flex; align-items: center;">
-      <span style="font-size: 12px; margin-right: 5px;">Is Expense?</span>
+      <span style="font-size: 12px; margin: 0.4rem 0.4rem 0.4rem 0;">Is Expense?</span>
       <input type="checkbox" bind:checked={isExpense} />
     </div>
     <select multiple bind:value={categoryIds}>
@@ -76,11 +75,10 @@
       {/each}
     </select>
 
-    <button on:click={insertTransaction}> Add Transaction </button>
-  </div>
+    <button on:click={insertTransaction}>Add Transaction</button>
+  </section>
 
-  <div class="category-form">
-    <h3>Modify Categories</h3>
+  <section class="category__form">
     <div>
       <input bind:value={categoryLabel} />
       <button style="margin-bottom: 1rem;" on:click={upsertCategory}>Add</button>
@@ -93,33 +91,30 @@
         label={category.label}
       />
     {/each}
-  </div>
-</div>
+  </section>
+</section>
 
 <style lang="scss">
-  .creation-forms {
+  .creation__forms {
+    margin: 2rem;
     display: flex;
     flex-direction: row;
     justify-content: left;
     flex-wrap: wrap;
     > * {
       min-width: 20rem;
-      margin: 1rem;
-      border: 1px solid black;
-      padding: 1rem;
+      margin: 0.1rem;
+      border: 1px solid #ccc;
+      padding: 2rem;
     }
   }
 
-  input {
-    margin: 0.5rem 0;
-  }
-
-  .category-form {
+  .category__form {
     display: flex;
     flex-direction: column;
   }
 
-  .transaction-form {
+  .transaction__form {
     display: flex;
     flex-direction: column;
   }
