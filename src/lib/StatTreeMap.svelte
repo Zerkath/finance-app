@@ -19,7 +19,7 @@
 
 <div>
   <p>{label}</p>
-  <svg {width} {height}>
+  <svg viewBox="0 0 {width} {height}">
     {#each root.leaves() as leaf}
       <rect
         x={leaf.x0}
@@ -52,3 +52,19 @@
     {/each}
   </svg>
 </div>
+
+<style lang="scss">
+  div {
+    min-width: 450px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  svg {
+    width: 100%;
+    height: 100%;
+  }
+</style>
