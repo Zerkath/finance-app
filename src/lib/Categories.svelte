@@ -97,12 +97,14 @@
 <style lang="scss">
   .creation__forms {
     margin: 2rem;
+    padding-bottom: 80px;
     display: flex;
     flex-direction: row;
-    justify-content: left;
+    justify-content: space-evenly;
     flex-wrap: wrap;
     > * {
       min-width: 20rem;
+      width: 30%;
       margin: 0.1rem;
       border: 1px solid #ccc;
       padding: 2rem;
