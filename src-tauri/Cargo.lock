@@ -989,6 +989,7 @@ name = "finance-app"
 version = "0.0.0"
 dependencies = [
  "cargo-tarpaulin",
+ "chrono",
  "rusqlite",
  "serde",
  "serde_json",

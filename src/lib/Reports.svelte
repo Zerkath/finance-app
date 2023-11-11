@@ -88,6 +88,7 @@
     padding: 1rem;
     padding-bottom: 80px;
   }
+
   .report__controls {
     display: flex;
     flex-direction: row;
@@ -105,15 +106,19 @@
     flex-direction: row;
     flex-wrap: wrap;
     margin: auto;
-    align-items: center;
+    justify-content: space-evenly;
+    height: 100%;
+    width: 60%;
   }
 
   .report__categories {
-    margin-left: 2rem;
+    min-width: 450px;
+    padding: 1rem;
     display: flex;
     flex-direction: column;
-    flex-wrap: wrap;
-    justify-content: center;
+    justify-content: space-between;
+
+    width: 20%;
   }
 
   option {
