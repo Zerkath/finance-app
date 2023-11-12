@@ -24,6 +24,14 @@ fn get_categories(handle: AppHandle) -> Result<Vec<models::Category>, String> {
 
 #[tauri::command]
 #[cfg(not(tarpaulin_include))]
+fn update_category_label(handle: AppHandle, id: i32, label: &str) -> Result<(), String> {
+    handle
+        .db(|db| category_service::update_category_label(db, id, label))
+        .map_err(|e| e.to_string())
+}
+
+#[tauri::command]
+#[cfg(not(tarpaulin_include))]
 fn delete_category(handle: AppHandle, id: i32) -> Result<(), String> {
     handle
         .db(|db| category_service::delete_category(db, id))
@@ -151,6 +159,7 @@ fn main() {
         .invoke_handler(tauri::generate_handler![
             get_categories,
             delete_category,
+            update_category_label,
             insert_category,
             get_transactions,
             delete_transaction,
