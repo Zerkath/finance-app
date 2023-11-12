@@ -11,6 +11,21 @@ pub fn insert_category(db: &Connection, label: &str) -> Result<(), rusqlite::Err
     Ok(())
 }
 
+pub fn update_category_label(
+    db: &Connection,
+    id: i32,
+    label: &str,
+) -> Result<(), rusqlite::Error> {
+    db.execute(
+        "UPDATE categories SET label = (:label) WHERE id = (:id);",
+        named_params! {
+            ":label": label.to_lowercase().trim(),
+            ":id": id,
+        },
+    )?;
+    Ok(())
+}
+
 pub fn delete_category(db: &Connection, id: i32) -> Result<(), rusqlite::Error> {
     db.execute(
         "DELETE FROM categories WHERE id = (:id);",
@@ -142,6 +157,35 @@ fn delete_should_remove_entry() -> Result<(), rusqlite::Error> {
         "Expected list with no items, got {:?}",
         list
     );
+
+    Ok(())
+}
+
+#[test]
+fn should_be_able_to_change_label() -> Result<(), rusqlite::Error> {
+    let conn = init_db_in_memory()?;
+
+    insert_category(&conn, "test")?;
+
+    let mut list = get_categories(&conn)?;
+    assert!(
+        list.len() == 1,
+        "Expected list with one item, got {:?}",
+        list
+    );
+
+    assert_eq!(list[0].label, "test");
+
+    update_category_label(&conn, list[0].id, "foobar")?;
+
+    list = get_categories(&conn)?;
+    assert!(
+        list.len() == 1,
+        "Expected list with one item, got {:?}",
+        list
+    );
+
+    assert_eq!(list[0].label, "foobar");
 
     Ok(())
 }
