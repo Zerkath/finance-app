@@ -26,26 +26,22 @@ const getScreen = () => {
   return { editOrCancelButton, saveOrDeleteButton, textField };
 };
 
-test('Initially should have two buttons available', async () => {
-  const { editOrCancelButton, saveOrDeleteButton } = getScreen();
+test('Initially should have two buttons available, and the textfield should be disabled', async () => {
+  const { editOrCancelButton, saveOrDeleteButton, textField } = getScreen();
   expect(editOrCancelButton.textContent).toBe('Edit');
   expect(saveOrDeleteButton.textContent).toBe('Delete');
-});
-
-test('Should disable textfield', async () => {
-  const { textField } = getScreen();
-
   expect(textField.disabled).toBe(true);
   expect(textField.value).toBe('Test');
 });
 
-test('After clicking edit, should have cancel and save available', async () => {
-  const { editOrCancelButton, saveOrDeleteButton } = getScreen();
+test('After clicking edit, should have cancel, save and input should be enabled', async () => {
+  const { editOrCancelButton, saveOrDeleteButton, textField } = getScreen();
 
   await fireEvent.click(editOrCancelButton);
 
   expect(editOrCancelButton.textContent).toBe('Cancel');
   expect(saveOrDeleteButton.textContent).toBe('Save');
+  expect(textField.disabled).toBe(false);
 });
 
 test('Editing then cancelling should revert back to original value', async () => {
