@@ -6,11 +6,6 @@
     console.log(response);
   };
 
-  const initWithData = async () => {
-    const response = await invoke('init_with_data');
-    console.log(response);
-  };
-
   let isVisible = false;
 </script>
 
@@ -22,7 +17,6 @@
 
   {#if isVisible}
     <button on:click={resetDB}>Reset DB</button>
-    <button on:click={initWithData}>Init with data</button>
   {/if}
 </section>
 
