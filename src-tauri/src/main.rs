@@ -122,13 +122,6 @@ fn reset_database(handle: AppHandle) -> Result<(), String> {
         .map_err(|e| e.to_string())
 }
 
-#[tauri::command]
-fn init_with_data(handle: AppHandle) -> Result<(), String> {
-    handle
-        .db(|db| migration_service::init_db_with_data(db))
-        .map_err(|e| e.to_string())
-}
-
 #[cfg(not(tarpaulin_include))]
 fn main() {
     tauri::Builder::default()
@@ -166,8 +159,7 @@ fn main() {
             insert_transaction,
             get_report_types,
             get_basic_report,
-            reset_database,
-            init_with_data
+            reset_database
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
